@@ -1,0 +1,50 @@
+version: 2.1
+orbs:
+  aws-ecr: circleci/aws-ecr@7.0.0
+  aws-ecs: circleci/aws-ecs@1.0.1
+  slack: circleci/slack@4.4.4
+
+jobs:
+  notify_slack:
+    docker:
+      - image: cimg/base:stable
+    steps:
+      - slack/notify:
+              event: fail
+              template: basic_fail_1
+      - slack/notify:
+              event: pass
+              template: success_tagged_deploy_1
+
+workflows:
+  build-and-deploy:
+    jobs:
+      - aws-ecr/build-and-push-image:
+          context: org-secrets
+          create-repo: true
+          repo: face_detect
+          tag: latest
+          filters:
+            branches:
+              only:
+                - main
+      - aws-ecs/deploy-service-update:
+          context: org-secrets
+          requires:
+            - aws-ecr/build-and-push-image
+          family: face_detect-task-definition-family
+          cluster-name: face_detect-cluster
+          container-image-name-updates: "container=face_detect,tag=latest"
+          service-name: face_detect-master
+          filters:
+            branches:
+              only:
+                - main
+      - notify_slack:
+          context: slack-secrets
+          requires:
+            - aws-ecs/deploy-service-update
+          filters:
+            branches:
+              only:
+                - main
