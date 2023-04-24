@@ -1,55 +1,73 @@
-import base64
-import numpy as np
-from cvzone.HandTrackingModule import HandDetector
-from cvzone.FaceDetectionModule import FaceDetector
-from cvzone.FaceMeshModule import FaceMeshDetector
-import cv2
-from flask import Flask, jsonify, request
-from flask_cors import CORS, cross_origin
+import json
+import logging
+import os
 
-app = Flask(__name__)
-CORS(app, support_credentials=True)
+from flask import Flask, jsonify
+from flask_cors import CORS
+from werkzeug.exceptions import HTTPException
 
+from routes import routes
 
-@app.route("/")
-def hello_world():
-    return jsonify({"hello": "world!"})
+cors = CORS()
 
-@app.route('/', methods=['POST'])
-@cross_origin(supports_credentials=True)
-def detect_hands():
-    # get the image data from the request
-    image_data = request.json['image']
+def create_app(test_config=None):
+    # create and configure the app
+    app = Flask(__name__, instance_relative_config=True)
+    app.config.from_mapping(
+        SECRET_KEY='dev',
+    )
+    register_cors(app)
+    register_error_handler(app)
+    register_routes(app)
     
-    # convert the base64-encoded image data to a numpy array
-    image_np = np.fromstring(base64.b64decode(image_data), dtype=np.uint8)
-    
-    # decode the numpy array as an OpenCV image
-    img = cv2.imdecode(image_np, cv2.IMREAD_COLOR)
-    
-    # initialize the detector
-    detector = HandDetector(detectionCon=0.05, maxHands=2)
-    faceDetector = FaceDetector()
-    faceMeshDetector = FaceMeshDetector()
-    
-    # detect the hands in the image
-    hands, img = detector.findHands(img)
-    # print(str(base64.b64decode(img)))
-    print("hands", len(hands))
-    
-    img, faceMesh = faceMeshDetector.findFaceMesh(img, draw=False) # 
-    print("faceMesh", len(faceMesh))
-    
-    img, faces = faceDetector.findFaces(img) #
-    print("faces", len(faces))
-    
-    # cv2.imwrite("temp_img.jpg", img)
-    
-    # return the results as a JSON object
-    if hands:
-        return jsonify({'success': False, 'status': 400, 'message': "Hands detect"}),400
+
+    if test_config is None:
+        # load the instance config, if it exists, when not testing
+        app.config.from_pyfile('config.py', silent=True)
     else:
-        return jsonify({'success': True, 'status': 200, 'message': 'All good!'}),200
+        # load the test config if passed in
+        app.config.from_mapping(test_config)
+
+    # healthcheck
+    @app.route('/')
+    def health():
+        return jsonify({"message": "Ok!"})
+    
+    
+    return app
+
+def register_cors(app):
+    app.logger.info("Registering cors handlers....")
+    cors.init_app(app, origins="*")
+    
+def register_error_handler(app):
+    # global handler for uncaught exceptions
+    def handle_exception(e):
+        logging.exception(e)
+        response = jsonify({
+            "status": 500,
+            "error": "Server error",
+            "message": "Something went wrong. Try again.",
+        })
+        response.content_type = "application/json"
+        return response, 500
+    
+    # global handler for http exceptions
+    def handle_error(e):
+        response = e.get_response()
+        response.data = json.dumps({
+            "status": e.code,
+            "error": e.name,
+            "message": e.description,
+        })
+        response.content_type = "application/json"
+        return response, e.code
+    app.errorhandler(HTTPException)(handle_error)
+    app.errorhandler(Exception)(handle_exception)
+
+def register_routes(app):
+    app.register_blueprint(routes.bp)
 
 if __name__ == '__main__':
+    app = create_app()
     app.run(debug=True, port=9000)
