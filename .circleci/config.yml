@@ -22,7 +22,7 @@ workflows:
       - aws-ecr/build-and-push-image:
           context: org-secrets
           create-repo: true
-          repo: face_detect
+          repo: face_detect_dev
           tag: latest
           filters:
             branches:
@@ -32,14 +32,14 @@ workflows:
           context: org-secrets
           requires:
             - aws-ecr/build-and-push-image
-          family: face_detect-task-definition-family
-          cluster-name: face_detect-cluster
-          container-image-name-updates: "container=face_detect,tag=latest"
-          service-name: face_detect-master
+          family: face_detect_dev-task-definition-family
+          cluster-name: face_detect_dev-cluster
+          container-image-name-updates: "container=face_detect_dev,tag=latest"
+          service-name: face_detect_dev-master
           filters:
             branches:
               only:
-                - main
+                - dev
       - notify_slack:
           context: slack-secrets
           requires:
@@ -47,4 +47,4 @@ workflows:
           filters:
             branches:
               only:
-                - main
+                - dev
