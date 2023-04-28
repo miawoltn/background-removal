@@ -27,7 +27,7 @@ workflows:
           filters:
             branches:
               only:
-                - main
+                - dev
       - aws-ecs/deploy-service-update:
           context: org-secrets
           requires:
