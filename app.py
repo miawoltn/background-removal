@@ -1,6 +1,7 @@
 import json
 import logging
 import os
+from dotenv import load_dotenv
 
 from flask import Flask, jsonify
 from flask_cors import CORS
@@ -9,12 +10,13 @@ from werkzeug.exceptions import HTTPException
 from routes import routes
 
 cors = CORS()
+load_dotenv()
 
 def create_app(test_config=None):
     # create and configure the app
     app = Flask(__name__, instance_relative_config=True)
     app.config.from_mapping(
-        SECRET_KEY='dev',
+        SECRET_KEY='0c2eb19e1f5d095df089eff91fa6a66578647c9e55e9f9de49fcc329b3f5bca8',
     )
     register_cors(app)
     register_error_handler(app)
