@@ -32,7 +32,7 @@ class DetectionService:
         self.__glassesDetector = GlassesDetector()
         
         self.__image = None
-        self.__features = {"all": self.__apply_detections, "hand": self.__detect_hand, "glasses": self.__detect_glasses, "expressions": None}
+        self.__features = {"all": self.__apply_detections, "face": self.__detect_face, "hand": self.__detect_hand, "glasses": self.__detect_glasses, "expressions": None}
         
         self.detections = {}
         self.is_face = False
@@ -49,7 +49,7 @@ class DetectionService:
         """
         Detect specified features in the image.
         :param image: Image to detect features from.
-        :param feature: Feature to be detected in the image.
+        :param feature: Feature to be detected in the image. Values can either be all, face, hand, glasses or expressions.
         """
         
         if not image: 
