@@ -48,6 +48,17 @@ def detect_glasses():
         return jsonify({'success': False, 'status': 400, 'message': "Eye glasses detected."}),400
     else:
         return jsonify({'success': True, 'status': 200, 'message': 'All good!'}),200
+
+################################################################
+@bp.route('/detect-expression', methods=['POST'])
+def detect_expression(): 
+    # get the image data from the request
+    image_data = request.json['image']
+    myDetector.detect(image_data, feature="expression")
+    if myDetector.is_neutral:
+        return jsonify({'success': False, 'status': 400, 'message': "Keep a straight face."}),400
+    else:
+        return jsonify({'success': True, 'status': 200, 'message': 'All good!'}),200
     
 ################################################################  
 def get_response(myDetector):
