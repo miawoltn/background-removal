@@ -126,17 +126,11 @@ class DetectionService:
         self.has_glasses = self.__glassesDetector.hasGlasses(self.__image)
         
     def __detect_emotions(self):
-        # model = self.__emotionDetector.loadModel()
-        # self.__emotionDetector.detect(self.__image)
-        # convert the base64-encoded image data to a numpy array
-        image_np = np.fromstring(base64.b64decode(self.__image), dtype=np.uint8)
-        
-        # decode the numpy array as an OpenCV image
-        img = cv2.imdecode(image_np, cv2.IMREAD_COLOR)
-        
-        result = DeepFace.analyze(img,actions=['emotion'], silent=True)
-        print(result[0])
-        self.is_neutral = result[0]['dominant_emotion'] == 'neutral'
+        """
+        Detects dorminant emotion on face
+        """
+        emotion = self.__emotionDetector.detect(self.__image)
+        self.is_neutral = emotion == 'neutral'
         
     # def __detect_objects(self):
     #       # convert the base64-encoded image data to a numpy array
