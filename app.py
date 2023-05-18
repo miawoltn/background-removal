@@ -1,7 +1,8 @@
 import json
 import logging
 import os
-from dotenv import load_dotenv
+from pathlib import Path
+# from dotenv import load_dotenv
 
 from flask import Flask, jsonify
 from flask_cors import CORS
@@ -10,7 +11,7 @@ from werkzeug.exceptions import HTTPException
 from routes import routes
 
 cors = CORS()
-load_dotenv()
+# load_dotenv()
 
 def create_app(test_config=None):
     # create and configure the app
@@ -29,6 +30,8 @@ def create_app(test_config=None):
     else:
         # load the test config if passed in
         app.config.from_mapping(test_config)
+
+    os.makedirs(str(Path.home()) + "/.weights", exist_ok=True)
 
     # healthcheck
     @app.route('/')

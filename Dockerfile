@@ -8,9 +8,11 @@ WORKDIR /app
 
 # Copy the requirements file into the container
 COPY requirements.txt .
+COPY requirements-no-deps.txt .
 
 # Install dependencies
 RUN pip install -r requirements.txt
+RUN pip install --no-deps -r requirements-no-deps.txt
 
 # Copy the application code into the container
 COPY . .
