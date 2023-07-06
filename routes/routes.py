@@ -2,7 +2,7 @@
 from flask import Blueprint, jsonify, request
 from services import DetectionService
 
-bp = Blueprint('routes', __name__, url_prefix='/')
+bp = Blueprint('routes', __name__, url_prefix='/v1/')
 
 myDetector = DetectionService()
 

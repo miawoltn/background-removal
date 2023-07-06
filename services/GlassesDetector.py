@@ -173,12 +173,12 @@ class GlassesDetector:
         measure_2 = sum(sum(roi_2/255)) / (np.shape(roi_2)[0] * np.shape(roi_2)[1])
         measure = measure_1*0.3 + measure_2*0.7
         
-        print(measure)
+        # print(measure)
         
         # Determine the discriminant value based on the relationship between the evaluation value and the threshold
         if measure > self.__threshold:
             judge = True
         else:
             judge = False
-        print(judge)
+        # print(judge)
         return judge

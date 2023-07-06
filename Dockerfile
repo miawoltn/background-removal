@@ -11,6 +11,7 @@ COPY requirements.txt .
 COPY requirements-no-deps.txt .
 
 # Install dependencies
+RUN pip install --upgrade pip
 RUN pip install -r requirements.txt
 RUN pip install --no-deps -r requirements-no-deps.txt
 
@@ -23,8 +24,4 @@ EXPOSE 5000
 # Set the environment variable for Flask
 ENV FLASK_APP=app.py
 
-# Run the Flask app
-CMD ["flask", "run", "--host", "0.0.0.0"]
-
-# production
-# CMD [ "waitress-serve", "--call" , "app:create_app"]
+CMD ["gunicorn", "--workers=1", "--timeout=3600", "--bind=0.0.0.0:5000", "app:create_app()"]
