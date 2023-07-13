@@ -12,7 +12,9 @@ pandas==2.0.1
 tqdm>=4.30.0
 gdown==4.7.1
 # keras>=2.2.0
-# mtcnn
-# retina-face --no-deps
+torch>=1.9.0 --extra-index-url https://download.pytorch.org/whl/cpu
+torchvision>=0.10.0 --extra-index-url https://download.pytorch.org/whl/cpu
+scipy
 gunicorn
-# deepface
+imageai
+# quart

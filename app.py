@@ -7,6 +7,7 @@ from pathlib import Path
 from flask import Flask, jsonify
 from flask_cors import CORS
 from werkzeug.exceptions import HTTPException
+from commons.functions import initialize_folder
 
 from routes import routes
 
@@ -31,7 +32,9 @@ def create_app(test_config=None):
         # load the test config if passed in
         app.config.from_mapping(test_config)
 
-    os.makedirs(str(Path.home()) + "/.weights", exist_ok=True)
+    os.makedirs(str(Path.home()) + "/.facedetect", exist_ok=True)
+    os.makedirs(str(Path.home()) + "/.facedetect/models", exist_ok=True)
+    # initialize_folder()
 
     # healthcheck
     @app.route('/')

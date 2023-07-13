@@ -1,6 +1,7 @@
 
 from flask import Blueprint, jsonify, request
 from services import DetectionService
+# import asyncio
 
 bp = Blueprint('routes', __name__, url_prefix='/v1/')
 
@@ -60,6 +61,18 @@ def detect_expression():
     else:
         return jsonify({'success': True, 'status': 200, 'message': 'All good!'}),200
     
+    
+    ################################################################
+@bp.route('/detect-face-mask', methods=['POST'])
+def detect_face_mask(): 
+    # get the image data from the request
+    image_data = request.json['image']
+    myDetector.detect(image_data, feature="face-mask")
+    if not myDetector.has_face_mask:
+        return jsonify({'success': False, 'status': 400, 'message': "Face mask detected."}),400
+    else:
+        return jsonify({'success': True, 'status': 200, 'message': 'All good!'}),200
+    
 ################################################################  
 def get_response(myDetector):
     if not myDetector.is_face:
@@ -70,6 +83,8 @@ def get_response(myDetector):
         return jsonify({'success': False, 'status': 400, 'message': "Keep hands away from face."}),400
     elif myDetector.has_glasses:
         return jsonify({'success': False, 'status': 400, 'message': "Eye glasses detected."}),400
+    elif myDetector.has_face_mask:
+        return jsonify({'success': False, 'status': 400, 'message': "Face mask detected."}),400
     if not myDetector.is_neutral:
         return jsonify({'success': False, 'status': 400, 'message': "Keep a straight face."}),400
     else:
