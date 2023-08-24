@@ -1,6 +1,7 @@
 import base64
 import cv2
 import numpy as np
+from PIL import ImageColor
 
 from cvzone.HandTrackingModule import HandDetector
 from cvzone.FaceDetectionModule import FaceDetector
@@ -9,8 +10,8 @@ from cvzone.FaceMeshModule import FaceMeshDetector
 from deepface import DeepFace
 from services.EmotionDetector import EmotionDetector
 from services.FaceMaskDetector import FaceMaskDetector
-
 from services.GlassesDetector import GlassesDetector
+from services.ImageBackground import ImageBackground
 
 
 class DetectionService:
@@ -26,16 +27,9 @@ class DetectionService:
         self.__faceMeshDetector = FaceMeshDetector()
         self.__handDetector = HandDetector(detectionCon=0.05, maxHands=2)
         self.__faceMaskDetector = FaceMaskDetector()
-        
-        # ImageAI instantiation
-        # self.__objectDetecor = ObjectDetection()
-        # self.__objectDetecor.setModelTypeAsRetinaNet()
-        # self.__objectDetecor.setModelPath("/Users/aminuabdulmalik/Documents/Official/FACE_DETECTION_API/models/retinanet_resnet50_fpn_coco-eeacb38b.pth")
-        # self.__objectDetecor.loadModel()
-        
-        # Glasses detector instantiation
         self.__glassesDetector = GlassesDetector()
         self.__emotionDetector = EmotionDetector()
+        self.__imageBackground = ImageBackground()
         
         self.__image = None
         self.__features = {"all": self.__apply_detections, "face": self.__detect_face, "hand": self.__detect_hand, "glasses": self.__detect_glasses, "expression": self.__detect_emotions, "face-mask": self.__detect_face_mask}
@@ -69,6 +63,32 @@ class DetectionService:
         detect_feature = self.__features[feature]
         detect_feature()
             
+    def clear_background(self, image, bg_color, output_format):
+        """
+        Clear the background
+        """
+        
+        # check image
+        if not image: 
+            raise Exception("Image is empty.")
+        
+        # check color
+        print(bg_color)
+        if not bg_color:
+            bg_color = None
+        else:
+            try:
+                bg_color = ImageColor.getrgb(bg_color)
+                bg_color = bg_color + (255,)
+            except:
+                raise Exception("Invalid color supplied.")
+            
+        # check output format
+        if not output_format or output_format not in ["png", "jpeg", "jpg"]:
+            output_format = None
+            
+      
+        return self.__imageBackground.remove(image, bg_color, output_format)
         
     def __apply_detections(self):
         """
@@ -137,6 +157,9 @@ class DetectionService:
         self.is_neutral = emotion == 'neutral'
         
     def __detect_face_mask(self):
+        """
+        Detects face mask
+        """
         is_face_mask = self.__faceMaskDetector.detect(self.__image)
         self.has_face_mask = is_face_mask
         

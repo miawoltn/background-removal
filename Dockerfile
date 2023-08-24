@@ -29,4 +29,4 @@ EXPOSE 5000
 # Set the environment variable for Flask
 ENV FLASK_APP=app.py
 
-CMD ["gunicorn", "--workers=4", "--timeout=3600", "--bind=0.0.0.0:5000", "app:create_app()"]
+CMD ["gunicorn", "--workers=1", "--timeout=3600", "--bind=0.0.0.0:5000", "app:create_app()"]

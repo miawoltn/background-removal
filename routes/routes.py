@@ -62,7 +62,7 @@ def detect_expression():
         return jsonify({'success': True, 'status': 200, 'message': 'All good!'}),200
     
     
-    ################################################################
+################################################################
 @bp.route('/detect-face-mask', methods=['POST'])
 def detect_face_mask(): 
     # get the image data from the request
@@ -72,6 +72,17 @@ def detect_face_mask():
         return jsonify({'success': False, 'status': 400, 'message': "Face mask detected."}),400
     else:
         return jsonify({'success': True, 'status': 200, 'message': 'All good!'}),200
+    
+################################################################
+@bp.route('/remove-background', methods=['POST'])
+def remove_background(): 
+    # get the image data from the request
+    image_data = request.json['image']
+    color = request.json['color']
+    format = request.json['format']
+    cleared_image = myDetector.clear_background(image_data, color, format)
+
+    return jsonify({'success': True, 'data': cleared_image, 'status': 200, 'message': 'Background cleared.'}),200
     
 ################################################################  
 def get_response(myDetector):
