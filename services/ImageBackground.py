@@ -16,7 +16,7 @@ class ImageBackground:
         img = Image.open(io.BytesIO(base64.b64decode(self.__image)))
         # print(img)
         
-        result = remove(img, bgcolor = color)
+        result = remove(img, session= new_session('u2net_human_sege'), bgcolor = color)
         
         buffered = io.BytesIO()
         if output_format == 'png' or output_format is None:
